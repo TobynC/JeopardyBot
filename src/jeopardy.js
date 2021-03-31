@@ -8,7 +8,7 @@ export function showLeaderboard(client, channel, userState, self) {
 export function showCategories(client, channel, userState, self, date, userStates) { 
    axios.get(`${jeopardyApiUrl}/${date}`).then(response => {
         const questions = formatQuestions(response.data);
-        const categories = [...new Set(questions.map(question => question.category))];
+        const categories = [...new Set(questions.map(question => question.category))].sort();
         console.log(categories);
 
         let output = '';
