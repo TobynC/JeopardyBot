@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "esm": "^3.2.25",
+    "node-cache": "^5.1.2",
     "tmi.js": "^1.7.5"
   }
 }
