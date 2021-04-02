@@ -2,6 +2,12 @@ import { nodeCache } from './state';
 import { jeopardyApiUrl, states, startDate } from './constants';
 import axios from 'axios';
 
+export function showMoney(client, channel, userState, self) {
+    const user = nodeCache.get(userState.username);
+
+    client.say(channel, `@${userState.username} $${user.money}`)
+}
+
 export function showLeaderBoard(client, channel, userState, self) {
     const entries = [];
 
@@ -9,7 +15,7 @@ export function showLeaderBoard(client, channel, userState, self) {
         entries.push(nodeCache.get(obj));
     }
 
-    const sortedList = entries.sort((a, b) => (a.money < b.money) ? 1 : -1).slice(0, 9);
+    const sortedList = entries.sort((a, b) => (a.money < b.money) ? 1 : -1).slice(0, 4);
     console.log(sortedList);
 
     //no one has played
@@ -52,24 +58,12 @@ export function showCategories(client, channel, userState, self) {
 
         const user = nodeCache.get(userState.username);
 
-        if (user == undefined) {
-            nodeCache.set(userState.username, {
-                username: userState.username,
-                state: states.AskedQuestion,
-                jeopardyDay: date,
-                categories: categories,
-                questions: questions,
-                money: 0
-            });
-        }
-        else {
-            user.state = states.AskedQuestion;
-            user.jeopardyDay = date;
-            user.categories = categories;
-            user.questions = questions;
+        user.state = states.AskedQuestion;
+        user.jeopardyDay = date;
+        user.categories = categories;
+        user.questions = questions;
 
-            nodeCache.set(user.username, user);
-        }
+        nodeCache.set(user.username, user);
 
         console.log('user:', user);
     }).catch(error => console.log(error));
@@ -122,8 +116,8 @@ export function checkAnswer(client, channel, userState, self, response) {
         client.say(channel, `@${userState.username} Sorry, the correct answer was ${user.chosenQuestion.answer}`);
     }
 
-    //update state
-    user.state = states.Answered;
+    //restart state
+    user.state = states.Registered;
     user.response = response;
 
     nodeCache.set(userState.username, user);
