@@ -22,6 +22,7 @@ client.connect().catch(console.error);
 
 client.on('message', (channel, userState, message, self) => {
     if(self) return;
+    
     //wipe scores after a week
     // const currentDate = new Date();
 

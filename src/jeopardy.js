@@ -1,5 +1,5 @@
 import { nodeCache } from './state';
-import { jeopardyApiUrl, states, startDate } from './constants';
+import { jeopardyApiUrl, states, startDate, timeLimit, answerPercentage } from './constants';
 import axios from 'axios';
 
 export function showMoney(client, channel, userState, self) {
@@ -98,6 +98,7 @@ export function showQuestion(client, channel, userState, self, responses) {
     //update state
     user.state = states.SelectedCategory;
     user.chosenQuestion = question;
+    user.questionTime = new Date();
 
     nodeCache.set(userState.username, user);
 
@@ -105,10 +106,22 @@ export function showQuestion(client, channel, userState, self, responses) {
 }
 
 export function checkAnswer(client, channel, userState, self, response) {
-    console.log('response', response);
     const user = nodeCache.get(userState.username);
 
-    if(similarity(response,user.chosenQuestion.answer) >= 0.70) {
+    //timed out
+    if (new Date().getTime() - user.questionTime.getTime() > timeLimit) {
+        client.say(channel, `@${userState.username} Sorry, you took too long to respond. The correct answer was ${user.chosenQuestion.answer}.`);
+
+        //restart state
+        user.state = states.Registered;
+        user.response = response;
+
+        nodeCache.set(userState.username, user);
+
+        return;
+    }
+
+    if(similarity(response, user.chosenQuestion.answer) >= answerPercentage) {
         client.say(channel, `@${userState.username} That is correct!`);
         user.money += user.chosenQuestion.value;
     }
@@ -121,8 +134,6 @@ export function checkAnswer(client, channel, userState, self, response) {
     user.response = response;
 
     nodeCache.set(userState.username, user);
-
-    console.log(user);
 }
 
 function formatQuestions(data) {
