@@ -24,12 +24,10 @@ client.on('message', (channel, userState, message, self) => {
     if(self) return;
     
     //wipe scores after a week
-    // const currentDate = new Date();
-
-    // if(currentDate.getTime() > (lastWipe.getDate() + 7)) {
-    //     userStates = [];
-    //     lastWipe = currentDate;
-    // }
+    if(new Date().getDate() - lastWipe.getDate() > 7) {
+        nodeCache.flushAll();
+        lastWipe = currentDate;
+    }
 
     message = message.trim().toLowerCase();
 
@@ -37,13 +35,13 @@ client.on('message', (channel, userState, message, self) => {
     if(commands.includes(message.split(' ')[0]))
         registerUser(userState.username);
 
-    if(message === '!money') {
+    if(message === '!money') 
         showMoney(client, channel, userState, self);
-    }
+    
 
-    else if (message === '!weekly') {
+    else if (message === '!weekly') 
         showLeaderBoard(client, channel, userState, self);
-    }
+    
 
     else if (message === '!jeopardy' && (nodeCache.get(userState.username).state === states.Registered || nodeCache.get(userState.username).state === states.AskedQuestion)) {
         client.say(channel, `@${userState.username} Loading categories, this might take some time...`)
