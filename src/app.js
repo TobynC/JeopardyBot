@@ -35,6 +35,9 @@ client.on('message', (channel, userState, message, self) => {
     if(commands.includes(message.split(' ')[0]))
         registerUser(userState.username);
 
+    if (message === '!help')
+        client.say(channel, `@${userState.username} Type !jeopardy to start. !category {category number} {dollar amount} to select a category. !whatis {answer} to submit the answer. !weekly to see the leader board. !money to see how much money you have this week.`);
+
     if(message === '!money') 
         showMoney(client, channel, userState, self);
     
